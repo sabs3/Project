@@ -1,64 +1,69 @@
-import java.io.File;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+
+import java.io.IOException;
 import java.util.TreeMap;
-import java.util.Map.Entry;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 public class User {
-//Separate method to implement users
 
-	public static void main(String[] args) {
-		TreeMap<String, String> treemap = new TreeMap<String, String>();
+	// Separate method to implement users
+
+	// parsing the elements using SAX parser
+
+	public TreeMap<String, String> userfile() {
+
+		// Tree for storing key and value pairs for user
+		TreeMap<String, String> utreemap = new TreeMap<String, String>();
+
+		// Create a "parser factory" for creating SAX parsers
+		SAXParserFactory spfac = SAXParserFactory.newInstance();
+
+		// Now use the parser factory to create a SAXParser object
+		SAXParser sp = null;
+		try {
+			sp = spfac.newSAXParser();
+		} catch (ParserConfigurationException | SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// Create an instance of this class; it defines all the handler methods
+		ReadXMLSax handler = new ReadXMLSax() {
+
+			public void startElement(String uri, String localName, String qName, Attributes attributes)
+					throws SAXException {
+
+				if (qName.equalsIgnoreCase("row")) {
+					String id = attributes.getValue("Id");
+					String name = attributes.getValue("DisplayName");
+					utreemap.put(id, name);
+
+				}
+			}
+
+			public void endElement(String uri, String localName, String qName) throws SAXException {
+
+			}
+
+			public void endDocument() throws SAXException {
+
+			}
+		};
 		try {
 
-			File fXmlFile = new File("/Users/sabinakhanal/Desktop/users.xml");
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
-
-			System.out.println("Root element : " + doc.getDocumentElement().getNodeName());
-
-			NodeList nList = doc.getElementsByTagName("row");
-
-			//System.out.println("---------" + nList.getLength());
-
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-				Node nNode = nList.item(temp);
-
-				// System.out.println("\nCurrent Element :" +
-				// nNode.getNodeName());
-
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-
-					Element eElement = (Element) nNode;
-					String id = eElement.getAttribute("Id");
-					String name = eElement.getAttribute("DisplayName");
-					treemap.put(id,name);
-	
-			}
-			}
-			
-			Set<Entry<String, String>> set = treemap.entrySet();
-			Iterator<Entry<String, String>> i = set.iterator();
-			
-			while (i.hasNext()) {
-				Map.Entry<String, String> me = i.next();
-				System.out.print("Id: " + me.getKey());
-				System.out.println(" name: " + me.getValue());
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			}
+			// Finally, tell the parser to parse the input and notify the
+			// handler
+			sp.parse("/Users/sabinakhanal/Desktop/users.xml", handler);
+		} catch (SAXException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
+		return utreemap;
+	}
+
 }
-		

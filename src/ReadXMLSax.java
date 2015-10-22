@@ -22,8 +22,10 @@ import org.xml.sax.helpers.DefaultHandler;
 //parsing the elements using  SAX parser
 public class ReadXMLSax extends DefaultHandler {
 
-	TreeMap<String, Integer> treemap = new TreeMap<String, Integer>();
-	TreeMap<String, Integer> treemap1 = new TreeMap<String, Integer>();
+	User userTree = new User();
+
+	private TreeMap<String, Integer> treemap;
+	private TreeMap<String, Integer> treemap1;
 
 	/** The main method sets things up for parsing */
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
@@ -42,42 +44,34 @@ public class ReadXMLSax extends DefaultHandler {
 
 	}
 
-	/*
-	 * When the parser encounters plain text (not XML elements), it calls(this
-	 * method, which accumulates them in a string buffer
-	 */
-	public void characters(char[] buffer, int start, int length) {
-		new String(buffer, start, length);
-	}
-
-	/*
-	 * Every time the parser encounters the beginning of a new element, it calls
-	 * this method, which resets the string buffer
-	 */
-
 	public void startDocument() throws SAXException {
+		treemap = new TreeMap<String, Integer>();
+		treemap1 = new TreeMap<String, Integer>();
 
 	}
 
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+
 		if (qName.equalsIgnoreCase("row")) {
 			String postType = attributes.getValue("PostTypeId");
 			String user = attributes.getValue("OwnerUserId");
+			if (postType != null && user != null) {
+				if (postType.equals("1")) {
+					if (treemap.containsKey(user)) {
+						treemap.put(user, treemap.get(user) + 1);
+					} else {
+						treemap.put(user, 1);
+					}
+				} else {
 
-			if (postType.equals("1")) {
-				if (treemap.containsKey(user)) {
-					treemap.put(user, treemap.get(user) + 1);
-				} else {
-					treemap.put(user, 1);
-				}
-			} else {
-				if (treemap1.containsKey(user)) {
-					treemap1.put(user, treemap1.get(user) + 1);
-				} else {
-					treemap1.put(user, 1);
+					if (treemap1.containsKey(user)) {
+						treemap1.put(user, treemap1.get(user) + 1);
+					} else {
+						treemap1.put(user, 1);
+					}
+
 				}
 			}
-
 		}
 	}
 
@@ -85,6 +79,14 @@ public class ReadXMLSax extends DefaultHandler {
 	 * When the parser encounters the end of an element, it calls this method
 	 */
 	public void endElement(String uri, String localName, String qName) throws SAXException {
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public void endDocument() throws SAXException {
+
+		TreeMap<String, String> u = userTree.userfile();
+
 		// Calling the method sortByvalues
 		Map<String, Integer> sortedMap = TreeMapDemo.sortByValues(treemap);
 		Map<String, Integer> sortedMap1 = TreeMapDemo.sortByValues(treemap1);
@@ -98,29 +100,38 @@ public class ReadXMLSax extends DefaultHandler {
 		Iterator<Entry<String, Integer>> j = set1.iterator();
 
 		// Display elements
-
-		int icounter = 0;
+		int iCounter = 0;
 		System.out.println("Tope 10 Id for PostType Id 1");
-		while (j.hasNext()) {
-			if (icounter == 10) {
+		System.out.println("----------------------------");
+		while (i.hasNext()) {
+			if (iCounter == 10) {
 				break;
 			}
-			icounter++;
-			Map.Entry<String, Integer> me = j.next();
-			System.out.print(me.getKey() + " appears ");
-			System.out.println(me.getValue() + " times");
+			iCounter++;
+			Map.Entry<String, Integer> u1 = i.next();
+			String user = u1.getKey();
+			if (u.containsKey(user)) {
+				System.out.print(u.get(user) + " appeared ");
+				System.out.println(u1.getValue() + " times");
+			}
 		}
 
 		int jcounter = 0;
+
+		System.out.println("----------------------------");
 		System.out.println("Tope 10 Id for PostType Id 2");
+		System.out.println("----------------------------");
 		while (j.hasNext()) {
 			if (jcounter == 10) {
 				break;
 			}
 			jcounter++;
-			Map.Entry<String, Integer> me = j.next();
-			System.out.print(me.getKey() + " appears ");
-			System.out.println(me.getValue() + " times");
+			Map.Entry<String, Integer> id = j.next();
+			String user = id.getKey();
+			if (u.containsKey(user)) {
+				System.out.print(u.get(user) + " appeared ");
+				System.out.println(id.getValue() + " times");
+			}
 		}
 
 	}
